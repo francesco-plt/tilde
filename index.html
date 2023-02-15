@@ -7,117 +7,89 @@
 
 <script>
   const CONFIG = {
-    commands: [
+    commandPathDelimiter: '/',
+    commandSearchDelimiter: ' ',
+    defaultSearchTemplate: 'https://google.com/?q={}',
+    openLinksInNewTab: true,
+    suggestionLimit: 4,
+  };
+
+  const COMMANDS = new Map([
+    [
+      'a',
       {
-        search: '/?q={}',
-        url: 'https://duckduckgo.com',
-      },
-      {
-        key: '0',
-        name: 'Local',
-        search: ':{}',
-        url: 'http://localhost:3000',
-      },
-      {
-        key: 'a',
         name: 'AWS',
+        suggestions: [
+          'a/cognito/v2/idp/user-pools',
+          'a/dynamodbv2#item-explorer',
+        ],
         url: 'https://us-west-2.console.aws.amazon.com/console/home',
       },
+    ],
+    [
+      'e',
       {
-        key: 'b',
-        name: 'Dribbble',
-        search: '/search/{}',
-        url: 'https://dribbble.com/shots/popular',
+        name: 'DALL·E',
+        suggestions: ['e/history', 'e/collections'],
+        url: 'https://labs.openai.com/',
       },
+    ],
+    [
+      'g',
       {
-        key: 'c',
-        name: 'Calendar',
-        search: '/calendar/u/0/r/search?q={}',
-        url: 'https://calendar.google.com/calendar/u/0/r',
-      },
-      {
-        key: 'd',
-        name: 'Drive',
-        search: '/drive/u/0/search?q={}',
-        url: 'https://drive.google.com/drive/u/0/my-drive',
-      },
-      {
-        key: 'f',
-        name: 'Figma',
-        url: 'https://www.figma.com/files/recent',
-      },
-      {
-        key: 'g',
         name: 'GitHub',
-        search: '/search?q={}',
+        searchTemplate: '/search?q={}',
+        suggestions: [
+          'g/topics',
+          'g/trending',
+          'g/collections',
+          'gist.github.com',
+        ],
         url: 'https://github.com',
       },
+    ],
+    ['i', { name: 'ChatGPT', url: 'https://chat.openai.com/chat' }],
+    [
+      'l',
       {
-        key: 'h',
-        name: 'Hypem',
-        search: '/search/{}',
-        url: 'https://hypem.com/latest',
+        name: 'LinkedIn',
+        searchTemplate: '/search/results/all/?keywords={}',
+        suggestions: ['l/in/me/', 'l/messaging', 'l/jobs'],
+        url: 'https://www.linkedin.com/feed/',
       },
+    ],
+    [
+      'm',
       {
-        key: 'i',
-        name: 'Inbox',
+        name: 'Mail',
+        suggestions: ['m/u/1/inbox', 'm/u/2/inbox'],
         url: 'https://mail.proton.me/u/0/inbox',
       },
+    ],
+    [
+      'r',
       {
-        key: 'k',
-        name: 'Keep',
-        search: '/u/0/#search/text={}',
-        url: 'https://keep.google.com/u/0',
-      },
-      {
-        key: 'l',
-        name: 'LinkedIn',
-        search: '/search/results/all/?keywords={}',
-        url: 'https://www.linkedin.com',
-      },
-      {
-        key: 'm',
-        name: 'Gmail',
-        url: 'https://mail.google.com/mail/u/0/#inbox',
-      },
-      {
-        key: 'n',
-        name: 'Notion',
-        url: 'https://www.notion.so',
-      },
-      {
-        key: 'p',
-        name: 'Hunt',
-        search: '/search?q={}',
-        url: 'https://www.producthunt.com',
-      },
-      {
-        key: 'r',
         name: 'Reddit',
-        search: '/search?q={}',
+        searchTemplate: '/search?q={}',
+        suggestions: [
+          'r/r/webdev',
+          'r/r/startpages',
+          'r/r/onebag',
+          'r/r/fujix',
+        ],
         url: 'https://www.reddit.com',
       },
+    ],
+    [
+      't',
       {
-        name: 'Slack',
-        suggestions: ['s/client/T09M5UWSV#shiftnudge'],
-        url: 'https://app.slack.com',
-      },
-      {
-        key: 't',
         name: 'Twitter',
-        search: '/search?q={}',
+        searchTemplate: '/search?q={}',
+        suggestions: [
+          't/explore/tabs/trending',
+          't/hashtag/buildinpublic?f=live',
+        ],
         url: 'https://twitter.com/home',
-      },
-      {
-        key: 'v',
-        name: 'Vercel',
-        url: 'https://vercel.com',
-      },
-      {
-        name: 'Wikipedia',
-        searchTemplate: '/w/index.php?search={}',
-        suggestions: ['w/wiki/Portal:Current_events', 'w/wiki/Special:Random'],
-        url: 'https://en.wikipedia.org/wiki/Main_Page',
       },
     ],
     [
@@ -128,49 +100,17 @@
         suggestions: ['y/trending', 'y/music', 'y/gaming', 'y/sports'],
         url: 'https://youtube.com/feed/subscriptions',
       },
-      {
-        key: 'r',
-        name: 'Reddit',
-        search: '/search?q={}',
-        url: 'https://www.reddit.com',
-      },
-      {
-        key: 'g',
-        name: 'GitHub',
-        search: '/search?q={}',
-        url: 'https://github.com',
-      },
-      {
-        key: 'p',
-        name: 'Servizi Poli',
-        url: 'https://servizionline.polimi.it/portaleservizi/portaleservizi/controller/Portale.do?jaf_currentWFID=main&EVN_SHOW_PORTALE=evento',
-      },
-      {
-        key: 'o',
-        name: 'OneDrive',
-        url: 'https://polimi365-my.sharepoint.com/personal/10783751_polimi_it/_layouts/15/onedrive.aspx?login_hint=10783751%40polimi%2Eit',
-      },
-      {
-        key: 't',
-        name: 'transfer.sh',
-        url: 'https://transfer.sh/',
-      }
     ],
-    suggestions: {
-      0: ["0'8000", "0'8080"],
-      a: ['a/cognito/v2/idp/user-pools', 'a/dynamodbv2#item-explorer'],
-      c: ['c/calendar/u/1/r', 'c/calendar/u/2/r'],
-      d: ['d/drive/u/1/my-drive', 'd/drive/u/2/my-drive'],
-      g: ['g/trending', 'g/ossu', 'g/xvvvyz/tilde', 'gist.github.com'],
-      h: ['h/popular', 'h/popular/lastweek', 'h/tags'],
-      i: ['i/u/1/inbox', 'i/u/2/inbox'],
-      k: ['k/u/1', 'k/u/2'],
-      m: ['m/mail/u/1/#inbox', 'm/mail/u/2/#inbox'],
-      r: ['r/r/startpages', 'r/r/webdev', 'r/r/onebag', 'r/r/fujix'],
-      s: ['s/collection/tracks', 's/playlist/37i9dQZEVXcXr3r4FYT3J7'],
-      y: ['y/feed/trending'],
-    },
-  };
+    [
+      '0',
+      {
+        name: 'localhost',
+        searchTemplate: ':{}',
+        suggestions: ['0 54323', '0 8000'],
+        url: 'http://localhost:3000',
+      },
+    ],
+  ]);
 </script>
 
 <style>
@@ -271,7 +211,8 @@
 
     @media (min-width: 1200px) {
       .commands {
-        grid-template-columns: repeat(5, 1fr);
+        columns: 6;
+        max-width: 60rem;
       }
     }
   </style>
