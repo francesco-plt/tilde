@@ -9,26 +9,123 @@
   const CONFIG = {
     commands: [
       {
+        search: '/?q={}',
+        url: 'https://duckduckgo.com',
+      },
+      {
+        key: '0',
+        name: 'Local',
+        search: ':{}',
+        url: 'http://localhost:3000',
+      },
+      {
+        key: 'a',
+        name: 'AWS',
+        url: 'https://us-west-2.console.aws.amazon.com/console/home',
+      },
+      {
+        key: 'b',
+        name: 'Dribbble',
+        search: '/search/{}',
+        url: 'https://dribbble.com/shots/popular',
+      },
+      {
+        key: 'c',
+        name: 'Calendar',
+        search: '/calendar/u/0/r/search?q={}',
+        url: 'https://calendar.google.com/calendar/u/0/r',
+      },
+      {
+        key: 'd',
+        name: 'Drive',
+        search: '/drive/u/0/search?q={}',
+        url: 'https://drive.google.com/drive/u/0/my-drive',
+      },
+      {
+        key: 'f',
+        name: 'Figma',
+        url: 'https://www.figma.com/files/recent',
+      },
+      {
+        key: 'g',
+        name: 'GitHub',
+        search: '/search?q={}',
+        url: 'https://github.com',
+      },
+      {
+        key: 'h',
+        name: 'Hypem',
+        search: '/search/{}',
+        url: 'https://hypem.com/latest',
+      },
+      {
+        key: 'i',
+        name: 'Inbox',
+        url: 'https://mail.proton.me/u/0/inbox',
+      },
+      {
+        key: 'k',
+        name: 'Keep',
+        search: '/u/0/#search/text={}',
+        url: 'https://keep.google.com/u/0',
+      },
+      {
+        key: 'l',
+        name: 'LinkedIn',
+        search: '/search/results/all/?keywords={}',
+        url: 'https://www.linkedin.com',
+      },
+      {
         key: 'm',
         name: 'Gmail',
         url: 'https://mail.google.com/mail/u/0/#inbox',
       },
       {
-        key: 's',
-        name: 'Spotify',
-        search: '/search/{}',
-        url: 'https://open.spotify.com',
+        key: 'n',
+        name: 'Notion',
+        url: 'https://www.notion.so',
       },
       {
-        key: 'x',
-        name: 'Netflix',
+        key: 'p',
+        name: 'Hunt',
         search: '/search?q={}',
-        url: 'https://www.netflix.com/browse',
+        url: 'https://www.producthunt.com',
       },
       {
-        key: 'y',
+        key: 'r',
+        name: 'Reddit',
+        search: '/search?q={}',
+        url: 'https://www.reddit.com',
+      },
+      {
+        name: 'Slack',
+        suggestions: ['s/client/T09M5UWSV#shiftnudge'],
+        url: 'https://app.slack.com',
+      },
+      {
+        key: 't',
+        name: 'Twitter',
+        search: '/search?q={}',
+        url: 'https://twitter.com/home',
+      },
+      {
+        key: 'v',
+        name: 'Vercel',
+        url: 'https://vercel.com',
+      },
+      {
+        name: 'Wikipedia',
+        searchTemplate: '/w/index.php?search={}',
+        suggestions: ['w/wiki/Portal:Current_events', 'w/wiki/Special:Random'],
+        url: 'https://en.wikipedia.org/wiki/Main_Page',
+      },
+    ],
+    [
+      'y',
+      {
         name: 'YouTube',
-        search: '/results?search_query={}',
+        searchTemplate: '/results?search_query={}',
+        suggestions: ['y/trending', 'y/music', 'y/gaming', 'y/sports'],
         url: 'https://youtube.com/feed/subscriptions',
       },
       {
@@ -60,10 +157,18 @@
       }
     ],
     suggestions: {
+      0: ["0'8000", "0'8080"],
+      a: ['a/cognito/v2/idp/user-pools', 'a/dynamodbv2#item-explorer'],
+      c: ['c/calendar/u/1/r', 'c/calendar/u/2/r'],
+      d: ['d/drive/u/1/my-drive', 'd/drive/u/2/my-drive'],
       g: ['g/trending', 'g/ossu', 'g/xvvvyz/tilde', 'gist.github.com'],
+      h: ['h/popular', 'h/popular/lastweek', 'h/tags'],
+      i: ['i/u/1/inbox', 'i/u/2/inbox'],
+      k: ['k/u/1', 'k/u/2'],
       m: ['m/mail/u/1/#inbox', 'm/mail/u/2/#inbox'],
       r: ['r/r/startpages', 'r/r/webdev', 'r/r/onebag', 'r/r/fujix'],
       s: ['s/collection/tracks', 's/playlist/37i9dQZEVXcXr3r4FYT3J7'],
+      y: ['y/feed/trending'],
     },
   };
 </script>
@@ -77,12 +182,12 @@
       Ubuntu, Roboto, Noto, Segoe UI, Arial, sans-serif;
     --font-size-1: 1rem;
     --font-size-2: 3rem;
-    --font-size-base: 110%;
+    --font-size-base: clamp(16px, 1.2vw, 18px);
     --font-weight-bold: 700;
     --font-weight-normal: 400;
     --line-height-base: 1.4;
-    --space-1: 1rem;
-    --space-2: 2rem;
+    --space-1: 0.5rem;
+    --space-2: 1rem;
     --space-3: 4rem;
     --transition-speed: 200ms;
   }
@@ -111,56 +216,62 @@
 <template id="commands-template">
   <style>
     .commands {
-      display: grid;
+      columns: 1;
       list-style: none;
-      margin: 0;
-      padding: 0;
+      margin: 0 auto;
+      max-width: 10rem;
+      padding: 0 0 0 var(--space-1);
+      width: 100vw;
     }
 
     .command {
-      color: inherit;
       display: flex;
+      gap: var(--space-2);
       outline: 0;
-      padding: var(--space-1) var(--space-2);
+      padding: var(--space-1);
       text-decoration: none;
     }
 
     .key {
-      font-weight: var(--font-weight-bold);
-      width: 1ch;
+      color: var(--color-text);
+      display: inline-block;
+      text-align: center;
+      width: 3ch;
     }
 
     .name {
       color: var(--color-text-subtle);
-      margin-left: var(--space-2);
       transition: color var(--transition-speed);
     }
 
-    .command:hover .name {
+    .command:where(:focus, :hover) .name {
       color: var(--color-text);
     }
 
     @media (min-width: 500px) {
       .commands {
-        grid-template-columns: repeat(2, 1fr);
+        columns: 2;
+        max-width: 20rem;
       }
     }
 
     @media (min-width: 700px) {
       .commands {
-        grid-template-columns: repeat(3, 1fr);
+        columns: 3;
+        max-width: 30rem;
       }
     }
 
     @media (min-width: 900px) {
       .commands {
-        grid-template-columns: repeat(4, 1fr);
+        columns: 4;
+        max-width: 40rem;
       }
     }
 
-    @media (min-width: 1100px) {
+    @media (min-width: 1200px) {
       .commands {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(5, 1fr);
       }
     }
   </style>
@@ -171,7 +282,7 @@
 
 <template id="command-template">
   <li>
-    <a class="command" rel="noopener noreferrer" target="_blank">
+    <a class="command" rel="noopener noreferrer">
       <span class="key"></span>
       <span class="name"></span>
     </a>
@@ -179,9 +290,9 @@
 </template>
 
 <script type="module">
-  class CommandsComponent extends HTMLElement {
+  class Commands extends HTMLElement {
     #refs = {
-      commandsContainer: null,
+      commands: null,
     };
 
     constructor() {
@@ -189,25 +300,28 @@
       this.attachShadow({ mode: 'open' });
       const template = document.getElementById('commands-template');
       const clone = template.content.cloneNode(true);
-      this.#refs.commandsContainer = clone.querySelector('.commands');
+      this.#refs.commands = clone.querySelector('.commands');
       this.#renderCommands();
       this.shadowRoot.append(clone);
     }
 
     #renderCommands() {
-      for (const { key, name, url } of CONFIG.commands) {
-        if (!name) continue;
-        const template = document.getElementById('command-template');
+      const template = document.getElementById('command-template');
+
+      for (const [key, { name, url }] of COMMANDS.entries()) {
+        if (!name || !url) continue;
         const clone = template.content.cloneNode(true);
-        clone.querySelector('.command').href = url;
+        const command = clone.querySelector('.command');
+        command.href = url;
+        if (CONFIG.openLinksInNewTab) command.target = '_blank';
         clone.querySelector('.key').innerText = key;
         clone.querySelector('.name').innerText = name;
-        this.#refs.commandsContainer.append(clone);
+        this.#refs.commands.append(clone);
       }
     }
   }
 
-  customElements.define('commands-component', CommandsComponent);
+  customElements.define('commands-component', Commands);
 </script>
 
 <template id="search-template">
@@ -228,16 +342,20 @@
       border: none;
       display: none;
       flex-direction: column;
-      height: 100vh;
+      height: 100%;
       justify-content: center;
       left: 0;
       padding: 0;
       top: 0;
-      width: 100vw;
+      width: 100%;
     }
 
     .dialog[open] {
       display: flex;
+    }
+
+    .form {
+      width: 100%;
     }
 
     .input {
@@ -263,35 +381,32 @@
     .suggestion {
       cursor: pointer;
       font-size: var(--font-size-1);
-      padding: var(--space-1) var(--space-2);
+      padding: var(--space-2);
       position: relative;
       transition: color var(--transition-speed);
       white-space: nowrap;
       z-index: 1;
     }
 
-    .suggestion:focus,
-    .suggestion:hover {
+    .suggestion:where(:focus, :hover) {
       color: var(--color-background);
     }
 
-    .suggestion::before,
     .suggestion::before {
       background-color: var(--color-text);
-      bottom: var(--space-1);
+      bottom: var(--space-2);
       content: ' ';
       left: var(--space-2);
       opacity: 0;
       position: absolute;
       right: var(--space-2);
-      top: var(--space-1);
+      top: var(--space-2);
       transform: translateY(0.5em);
       transition: all var(--transition-speed);
       z-index: -1;
     }
 
-    .suggestion:focus::before,
-    .suggestion:hover::before {
+    .suggestion:where(:focus, :hover)::before {
       opacity: 1;
       transform: translateY(0);
     }
@@ -301,8 +416,7 @@
       transition: color var(--transition-speed);
     }
 
-    .suggestion:focus .match,
-    .suggestion:hover .match {
+    .suggestion:where(:focus, :hover) .match {
       color: var(--color-background);
     }
 
@@ -331,17 +445,12 @@
 </template>
 
 <script type="module">
-  class SearchComponent extends HTMLElement {
-    static #PATH_DELIMITER = '/';
-    static #SEARCH_DELIMITER = "'";
-    static #SUGGESTION_LIMIT = 4;
-
+  class Search extends HTMLElement {
     #refs = {
       dialog: null,
       form: null,
       input: null,
-      suggestions: [],
-      suggestionsContainer: null,
+      suggestions: null,
     };
 
     constructor() {
@@ -352,10 +461,10 @@
       this.#refs.dialog = clone.querySelector('.dialog');
       this.#refs.form = clone.querySelector('.form');
       this.#refs.input = clone.querySelector('.input');
-      this.#refs.suggestionsContainer = clone.querySelector('.suggestions');
+      this.#refs.suggestions = clone.querySelector('.suggestions');
+      this.#refs.form.addEventListener('submit', this.#onSubmit, false);
       this.#refs.input.addEventListener('input', this.#onInput);
-      const onSubmit = () => this.#execute(this.#refs.input.value);
-      this.#refs.form.addEventListener('submit', onSubmit, false);
+      this.#refs.suggestions.addEventListener('click', this.#onSuggestionClick);
       document.addEventListener('keydown', this.#onKeydown);
       this.shadowRoot.append(clone);
     }
@@ -385,7 +494,16 @@
         const script = document.createElement('script');
         document.querySelector('head').appendChild(script);
         script.src = `https://duckduckgo.com/ac/?callback=autocompleteCallback&q=${search}`;
+        script.onload = script.remove;
       });
+    }
+
+    static #formatSearchUrl(url, searchPath, search) {
+      if (!searchPath) return url;
+      const [baseUrl] = Search.#splitUrl(url);
+      const urlQuery = encodeURIComponent(search);
+      searchPath = searchPath.replace(/{}/g, urlQuery);
+      return baseUrl + searchPath;
     }
 
     static #hasProtocol(s) {
@@ -404,107 +522,93 @@
         return { query, url };
       }
 
-      const searchSplit = query.split(SearchComponent.#SEARCH_DELIMITER);
-      const pathSplit = query.split(SearchComponent.#PATH_DELIMITER);
-      let defaultSearch = {};
-
-      for (const cmd of CONFIG.commands) {
-        if (query === cmd.key) {
-          return { key: cmd.key, query, url: cmd.url };
-        }
-
-        if (cmd.search && searchSplit[0] === cmd.key) {
-          const splitBy = SearchComponent.#SEARCH_DELIMITER;
-          const search = SearchComponent.#shiftAndTrim(searchSplit, splitBy);
-          const url = SearchComponent.#prepSearch(cmd.url, cmd.search, search);
-          return { key: cmd.key, query, search, splitBy, url };
-        }
-
-        if (pathSplit[0] === cmd.key) {
-          const splitBy = SearchComponent.#PATH_DELIMITER;
-          const path = SearchComponent.#shiftAndTrim(pathSplit, splitBy);
-          const url = `${SearchComponent.#stripUrlPath(cmd.url)}/${path}`;
-          return { key: cmd.key, path, query, splitBy, url };
-        }
-
-        if (!cmd.key) {
-          const url = SearchComponent.#prepSearch(cmd.url, cmd.search, query);
-          defaultSearch = { key: cmd.key, query, search: query, url };
-        }
+      if (COMMANDS.has(query)) {
+        const { key, url } = COMMANDS.get(query);
+        return { key, query, url };
       }
 
-      return defaultSearch;
+      let splitBy = CONFIG.commandSearchDelimiter;
+      const [searchKey, rawSearch] = query.split(new RegExp(`${splitBy}(.*)`));
+
+      if (COMMANDS.has(searchKey)) {
+        const { searchTemplate, url: base } = COMMANDS.get(searchKey);
+        const search = rawSearch.trim();
+        const url = Search.#formatSearchUrl(base, searchTemplate, search);
+        return { key: searchKey, query, search, splitBy, url };
+      }
+
+      splitBy = CONFIG.commandPathDelimiter;
+      const [pathKey, path] = query.split(new RegExp(`${splitBy}(.*)`));
+
+      if (COMMANDS.has(pathKey)) {
+        const { url: base } = COMMANDS.get(pathKey);
+        const [baseUrl] = Search.#splitUrl(base);
+        const url = `${baseUrl}/${path}`;
+        return { key: pathKey, path, query, splitBy, url };
+      }
+
+      const [baseUrl, rest] = Search.#splitUrl(CONFIG.defaultSearchTemplate);
+      const url = Search.#formatSearchUrl(baseUrl, rest, query);
+      return { query, search: query, url };
     };
 
-    static #prepSearch(url, searchPath, search) {
-      if (!searchPath) return url;
-      const baseUrl = SearchComponent.#stripUrlPath(url);
-      const urlQuery = encodeURIComponent(search);
-      searchPath = searchPath.replace(/{}/g, urlQuery);
-      return baseUrl + searchPath;
-    }
-
-    static #shiftAndTrim(array, delimiter) {
-      return array.slice(1).join(delimiter).trim();
-    }
-
-    static #stripUrlPath(url) {
+    static #splitUrl(url) {
       const parser = document.createElement('a');
       parser.href = url;
-      return `${parser.protocol}//${parser.hostname}`;
-    }
-
-    #clearSuggestions() {
-      this.#refs.suggestions = [];
-      this.#refs.suggestionsContainer.innerHTML = '';
+      const baseUrl = `${parser.protocol}//${parser.hostname}`;
+      const rest = `${parser.pathname}${parser.search}`;
+      return [baseUrl, rest];
     }
 
     #close() {
       this.#refs.input.value = '';
       this.#refs.input.blur();
       this.#refs.dialog.close();
-      this.#clearSuggestions();
+      this.#refs.suggestions.innerHTML = '';
     }
 
     #execute(query) {
-      const { url } = SearchComponent.#parseQuery(query);
-      window.open(url, '_blank', 'noopener noreferrer');
+      const { url } = Search.#parseQuery(query);
+      const target = CONFIG.openLinksInNewTab ? '_blank' : '_self';
+      window.open(url, target, 'noopener noreferrer');
       this.#close();
     }
 
     #focusNextSuggestion(previous = false) {
       const active = this.shadowRoot.activeElement;
-      const activeIndex = this.#refs.suggestions.indexOf(active);
       let nextIndex;
 
-      if (activeIndex === -1) {
-        nextIndex = previous ? this.#refs.suggestions.length - 1 : 0;
-      } else {
+      if (active.dataset.index) {
+        const activeIndex = Number(active.dataset.index);
         nextIndex = previous ? activeIndex - 1 : activeIndex + 1;
+      } else {
+        nextIndex = previous ? this.#refs.suggestions.childElementCount - 1 : 0;
       }
 
-      const next = this.#refs.suggestions[nextIndex];
-      if (next) next.focus();
+      const next = this.#refs.suggestions.children[nextIndex];
+      if (next) next.querySelector('.suggestion').focus();
       else this.#refs.input.focus();
     }
 
     #onInput = async () => {
-      const q = SearchComponent.#parseQuery(this.#refs.input.value);
+      const oq = Search.#parseQuery(this.#refs.input.value);
 
-      if (!q.query) {
+      if (!oq.query) {
         this.#close();
         return;
       }
 
-      let suggestions = CONFIG.suggestions[q.query] ?? [];
+      let suggestions = COMMANDS.get(oq.query)?.suggestions ?? [];
 
-      if (q.search && suggestions.length < SearchComponent.#SUGGESTION_LIMIT) {
-        const res = await SearchComponent.#fetchDuckDuckGoSuggestions(q.search);
-        const formatted = SearchComponent.#attachSearchPrefix(res, q);
+      if (oq.search && suggestions.length < CONFIG.suggestionLimit) {
+        const res = await Search.#fetchDuckDuckGoSuggestions(oq.search);
+        const formatted = Search.#attachSearchPrefix(res, oq);
         suggestions = suggestions.concat(formatted);
       }
 
-      this.#renderSuggestions(suggestions, q.query);
+      const nq = Search.#parseQuery(this.#refs.input.value);
+      if (nq.query !== oq.query) return;
+      this.#renderSuggestions(suggestions, oq.query);
     };
 
     #onKeydown = (e) => {
@@ -544,17 +648,27 @@
       }
     };
 
-    #renderSuggestions(suggestions, query) {
-      this.#clearSuggestions();
-      const sliced = suggestions.slice(0, SearchComponent.#SUGGESTION_LIMIT);
+    #onSubmit = () => {
+      this.#execute(this.#refs.input.value);
+    };
 
-      for (const suggestion of sliced) {
-        const template = document.getElementById('suggestion-template');
+    #onSuggestionClick = (e) => {
+      const ref = e.target.closest('.suggestion');
+      if (!ref) return;
+      this.#execute(ref.dataset.suggestion);
+    };
+
+    #renderSuggestions(suggestions, query) {
+      this.#refs.suggestions.innerHTML = '';
+      const sliced = suggestions.slice(0, CONFIG.suggestionLimit);
+      const template = document.getElementById('suggestion-template');
+
+      for (const [index, suggestion] of sliced.entries()) {
         const clone = template.content.cloneNode(true);
         const ref = clone.querySelector('.suggestion');
-        const onClick = this.#execute.bind(this, suggestion);
-        ref.addEventListener('click', onClick);
-        const escapedQuery = SearchComponent.#escapeRegexCharacters(query);
+        ref.dataset.index = index;
+        ref.dataset.suggestion = suggestion;
+        const escapedQuery = Search.#escapeRegexCharacters(query);
         const matched = suggestion.match(new RegExp(escapedQuery, 'i'));
 
         if (matched) {
@@ -571,27 +685,23 @@
           ref.innerText = suggestion;
         }
 
-        this.#refs.suggestions.push(ref);
-        this.#refs.suggestionsContainer.append(clone);
+        this.#refs.suggestions.append(clone);
       }
     }
   }
 
-  customElements.define('search-component', SearchComponent);
+  customElements.define('search-component', Search);
 </script>
 
 <style>
   main {
     align-items: center;
+    box-sizing: border-box;
     display: flex;
-    height: 100vh;
     justify-content: center;
+    min-height: 100vh;
+    padding: var(--space-3) var(--space-2);
     width: 100vw;
-  }
-
-  commands-component {
-    margin: auto;
-    padding: var(--space-3) 0;
   }
 </style>
 
